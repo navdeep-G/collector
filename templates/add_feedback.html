@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Add new feedback{% end %}
+
+{% block content %}
+<h1>Add new feedback</h1>
+
+{% if len(errors) > 0 %}
+<ul class="errors">
+    {% for error in errors %}
+    <li>{{ error }}</li>
+    {% end %}
+</ul>
+{% end %}
+
+<form  action="{{ request.path }}" enctype="multipart/form-data" method="post">
+    <label for="email">Email: </label><input type="email" name="email" value="{{ email }}"><br>
+    <label for="feedback">Feedback: </label><br>
+    <textarea name="feedback" cols="120" rows="30">{{ feedback }}</textarea><br>
+
+    Rating:&nbsp;{% module Rating('rating', checked=rating) %}
+    Attach log:&nbsp;<input type="file" name="log"><br>
+    <!-- No need for xsrf token - no session to steal -->
+    <input type="submit">
+</form>
+
+
+{% end %}

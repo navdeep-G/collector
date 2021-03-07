@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Feedbacks{% end %}
+
+{% block content %}
+<a href="/add" title="Add new feedback">Add new feedback</a>
+<a href="/populate" title="Populate feedbacks">Populate feedbacks</a>
+<table>
+    <thead>
+    <tr><th>Email</th><th>Feedback</th><th>Rating</th><th>Log</th></tr>
+    </thead>
+    <tbody>
+    {% for feedback in feedbacks %}
+        <tr>
+            <td>{{ feedback['email'] }}</td>
+            <td>{{ feedback['feedback'] }}</td>
+            <td>{% module Rating(feedback['log'], checked=feedback['rating'], disabled=True) %}</td>
+            <td><a href="/log/{{ feedback['log'] }}" title="Download Log">Download Log</a></td>
+        </tr>
+    {% end %}
+    </tbody>
+</table>
+{% end %}

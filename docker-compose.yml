@@ -1,0 +1,28 @@
+version:  '2'
+
+services:
+  minio1:
+    image:  minio/minio
+    ports:
+      -  '9001:9000'
+    environment:
+      MINIO_ACCESS_KEY:  'ACCESS-KEY'
+      MINIO_SECRET_KEY:  'SECRET-KEY'
+    command:  minio server /data
+  redis:
+    image:  'bitnami/redis:latest'
+    environment:
+      -  ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      -  '6379:6379'
+  feedback-collection-system:
+    image: 'feedback-collection-system:latest'
+    environment:
+      MINIO_ACCESS_KEY:  'ACCESS-KEY'
+      MINIO_SECRET_KEY:  'SECRET-KEY'
+      MINIO_URL: 'minio1:9000'
+      REDIS_URL: 'redis'
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+    ports: 
+      - '8888:8888'
