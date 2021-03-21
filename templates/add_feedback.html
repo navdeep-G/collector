@@ -14,11 +14,9 @@
 {% end %}
 
 <form  action="{{ request.path }}" enctype="multipart/form-data" method="post">
-    <label for="email">Email: </label><input type="email" name="email" value="{{ email }}"><br>
-    <label for="feedback">Feedback: </label><br>
+    <label for="feedback">Description: </label><br>
     <textarea name="feedback" cols="120" rows="30">{{ feedback }}</textarea><br>
 
-    Rating:&nbsp;{% module Rating('rating', checked=rating) %}
     Attach log:&nbsp;<input type="file" name="log"><br>
     <!-- No need for xsrf token - no session to steal -->
     <input type="submit">

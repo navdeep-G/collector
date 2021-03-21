@@ -67,17 +67,9 @@ def validate_feedback(feedback: Dict) -> List[str]:
     """
     errors = []
 
-    if not _valid_email_regex.match(feedback['email']):
-        errors.append('Email is not correct. Please provide correct email address.')
-
     # Maybe it would be wiser to have some minimal required amount of characters.
     if len(feedback['feedback'].strip()) == 0:
         errors.append('Your feedback is empty. Please provide your feedback.')
-
-    # Should not happen, since the rating is preselected to 3 and it should not be possible for accidentally uncheck
-    # radio button so that it leaves whole radio button group unchecked but better safe than sorry...
-    if feedback['rating'] is None:
-        errors.append('Please provide rating.')
 
     if feedback['log'] is None:
         errors.append('You did not attach log file. Please attach your log file.')

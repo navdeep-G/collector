@@ -16,15 +16,13 @@ class AddFeedbackHandler(tornado.web.RequestHandler):
     def get(self):
         """Renders the Add New Feedback form.
         """
-        return self.render('templates/add_feedback.html', email='', feedback='', rating='3', errors=[])
+        return self.render('templates/add_feedback.html',feedback='', errors=[])
 
     async def post(self):
         """Async handler for accepting feedback and storing it in DB.
         """
         feedback = dict(
-            email=self.get_body_argument('email'),
             feedback=self.get_body_argument('feedback'),
-            rating=self.get_body_argument('rating', None),
             log=self.request.files['log'][0] if 'log' in self.request.files else None
         )
 

@@ -3,19 +3,16 @@
 {% block title %}Feedbacks{% end %}
 
 {% block content %}
-<a href="/add" title="Add new feedback">Add new feedback</a>
-<a href="/populate" title="Populate feedbacks">Populate feedbacks</a>
+<a href="/add" title="Add file">Add new file</a>
 <table>
     <thead>
-    <tr><th>Email</th><th>Feedback</th><th>Rating</th><th>Log</th></tr>
+    <tr><th>Description</th><th>File</th></tr>
     </thead>
     <tbody>
     {% for feedback in feedbacks %}
         <tr>
-            <td>{{ feedback['email'] }}</td>
-            <td>{{ feedback['feedback'] }}</td>
-            <td>{% module Rating(feedback['log'], checked=feedback['rating'], disabled=True) %}</td>
-            <td><a href="/log/{{ feedback['log'] }}" title="Download Log">Download Log</a></td>
+            <td>{{feedback['feedback']}}</td>
+            <td><a href="/log/{{ feedback['log'] }}" title="Download file">Download File</a></td>
         </tr>
     {% end %}
     </tbody>
