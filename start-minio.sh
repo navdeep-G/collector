@@ -1,3 +1,0 @@
-export MINIO_ACCESS_KEY=ACCESS-KEY
-export MINIO_SECRET_KEY=SECRET-KEY
-minio server data
