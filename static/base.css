@@ -1,24 +1,6 @@
 body {
     background-color: black;
-    color: yellow;
-}
-
-.star-rating{
-    font-size: 2em;
-    text-shadow: darkgray 1px 1px;
-    white-space: nowrap;
-}
-
-.star-rating input[type='radio']{
-    display: none;
-}
-
-.star-rating label::before{
-    content: '★';
-}
-
-.star-rating input:checked ~ label::before{
-    color: gray;
+    color: white;
 }
 
 .errors {
@@ -31,13 +13,6 @@ body {
 .errors li{
     list-style: none;
     line-height: 3ex;
-}
-
-input[type=email], input[type=submit], textarea{
-    background-color: black;
-    color: yellow;
-    border: yellow solid 1px;
-    padding: 5px;
 }
 
 td{

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Feedbacks{% end %}
+{% block title %}Files{% end %}
 
 {% block content %}
 <a href="/add" title="Add file">Add new file</a>
@@ -9,10 +9,10 @@
     <tr><th>Description</th><th>File</th></tr>
     </thead>
     <tbody>
-    {% for feedback in feedbacks %}
+    {% for file in files %}
         <tr>
-            <td>{{feedback['feedback']}}</td>
-            <td><a href="/log/{{ feedback['log'] }}" title="Download file">Download File</a></td>
+            <td>{{file['file']}}</td>
+            <td><a href="/log/{{ file['log'] }}" title="Download file">Download File</a></td>
         </tr>
     {% end %}
     </tbody>

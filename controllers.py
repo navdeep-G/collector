@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 import tornado.web
 from tornado.ioloop import IOLoop
 
-from models import add_feedback, validate_feedback, get_feedbacks, get_log_stream
+from models import add_file, validate_file, get_files, get_log_stream
 
 # It appears that the minio is not asyncio "compatible" - it would block
 # So I use threading instead which should work fine since it is an IO-bound
@@ -12,50 +12,50 @@ from models import add_feedback, validate_feedback, get_feedbacks, get_log_strea
 _executor = ThreadPoolExecutor()
 
 
-class AddFeedbackHandler(tornado.web.RequestHandler):
+class AddFileHandler(tornado.web.RequestHandler):
     def get(self):
-        """Renders the Add New Feedback form.
+        """Renders the Add New File form.
         """
-        return self.render('templates/add_feedback.html',feedback='', errors=[])
+        return self.render('templates/add_file.html', file='', errors=[])
 
     async def post(self):
-        """Async handler for accepting feedback and storing it in DB.
+        """Async handler for accepting file and storing it in DB.
         """
-        feedback = dict(
-            feedback=self.get_body_argument('feedback'),
+        file = dict(
+            file=self.get_body_argument('file'),
             log=self.request.files['log'][0] if 'log' in self.request.files else None
         )
 
-        # Validate the feedback
-        errors = validate_feedback(feedback)
+        # Validate the file
+        errors = validate_file(file)
         if len(errors) > 0:
             return self.render(
-                'templates/add_feedback.html',
+                'templates/add_file.html',
                 errors=errors,
-                **feedback
+                **file
             )
 
-        # Save the feedback
+        # Save the file
         success = await IOLoop.current().run_in_executor(
             _executor,
-            add_feedback,
-            feedback
+            add_file,
+            file
         )
         if not success:
             errors.append('Opps! Something went wrong.')
             return self.render(
-                'templates/add_feedback.html',
+                'templates/add_file.html',
                 errors=errors,
-                **feedback
+                **file
             )
 
         self.redirect('/')
 
 
-class FeedbacksHandler(tornado.web.RequestHandler):
+class FilesHandler(tornado.web.RequestHandler):
     def get(self):
-        """Renders the list of feedbacks."""
-        return self.render('templates/list_feedbacks.html', feedbacks=get_feedbacks())
+        """Renders the list of files."""
+        return self.render('templates/list_files.html', files=get_files())
 
 
 class LogHandler(tornado.web.RequestHandler):
@@ -73,6 +73,6 @@ class LogHandler(tornado.web.RequestHandler):
 class PopulateHandler(tornado.web.RequestHandler):
     def get(self):
         # For docker
-        #os.system('python /app/populate_feedbacks.py &')
-        os.system('python populate_feedbacks.py &')
+        #os.system('python /app/populate_files.py &')
+        os.system('python populate_files.py &')
         self.redirect('/')

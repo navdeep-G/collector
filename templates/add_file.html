@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Add new feedback{% end %}
+{% block title %}Add new file{% end %}
 
 {% block content %}
-<h1>Add new feedback</h1>
+<h1>Add new file</h1>
 
 {% if len(errors) > 0 %}
 <ul class="errors">
@@ -14,10 +14,10 @@
 {% end %}
 
 <form  action="{{ request.path }}" enctype="multipart/form-data" method="post">
-    <label for="feedback">Description: </label><br>
-    <textarea name="feedback" cols="120" rows="30">{{ feedback }}</textarea><br>
+    <label for="file">Description: </label><br>
+    <textarea name="file" cols="120" rows="30">{{ file }}</textarea><br>
 
-    Attach log:&nbsp;<input type="file" name="log"><br>
+    Attach file:&nbsp;<input type="file" name="log"><br>
     <!-- No need for xsrf token - no session to steal -->
     <input type="submit">
 </form>

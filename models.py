@@ -24,14 +24,14 @@ _redis_client = redis.Redis(host=os.environ['REDIS_URL'],
                             db=int(os.environ['REDIS_DB']))
 
 
-def add_feedback(feedback: Dict) -> bool:
-    """Add feedback consisting of email, feedback (actual text), rating, and attached log file.
+def add_file(file: Dict) -> bool:
+    """Add file consisting of email, file (actual text), rating, and attached log file.
 
-    :param feedback: dictionary with the following keys ['email', 'feedback', 'rating', 'log']
+    :param file: dictionary with the following keys ['email', 'file', 'rating', 'log']
     :return: boolean success flag
     """
 
-    log_content = feedback['log']['body']
+    log_content = file['log']['body']
     log_filename = str(uuid.uuid4())
 
     try:
@@ -48,10 +48,10 @@ def add_feedback(feedback: Dict) -> bool:
         _logger.exception('Minio - saving the log failed.')
         return False
 
-    feedback['log'] = log_filename
+    file['log'] = log_filename
 
     try:
-        _redis_client.set(log_filename, json.dumps(feedback))
+        _redis_client.set(log_filename, json.dumps(file))
     except:
         _logger.exception('Setting a redis key failed.')
         return False
@@ -59,28 +59,28 @@ def add_feedback(feedback: Dict) -> bool:
     return True
 
 
-def validate_feedback(feedback: Dict) -> List[str]:
-    """Validate feedback consisting of email, feedback (actual text), rating, and attached log file.
+def validate_file(file: Dict) -> List[str]:
+    """Validate file consisting of email, file (actual text), rating, and attached log file.
 
-    :param feedback: dictionary with the following keys ['email', 'feedback', 'rating', 'log']
+    :param file: dictionary with the following keys ['email', 'file', 'rating', 'log']
     :return: list of errors
     """
     errors = []
 
     # Maybe it would be wiser to have some minimal required amount of characters.
-    if len(feedback['feedback'].strip()) == 0:
-        errors.append('Your feedback is empty. Please provide your feedback.')
+    if len(file['file'].strip()) == 0:
+        errors.append('Your file is empty. Please provide your file.')
 
-    if feedback['log'] is None:
+    if file['log'] is None:
         errors.append('You did not attach log file. Please attach your log file.')
 
     return errors
 
 
-def get_feedbacks() -> List[Dict]:
-    """Returns feedbacks
+def get_files() -> List[Dict]:
+    """Returns files
 
-    :return: list of dictionaries with the following keys ['email', 'feedback', 'rating', 'log']
+    :return: list of dictionaries with the following keys ['email', 'file', 'rating', 'log']
     """
     return [json.loads(_redis_client.get(item)) for item in _redis_client.scan_iter()]
 
