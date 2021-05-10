@@ -16,14 +16,14 @@ class AddFileHandler(tornado.web.RequestHandler):
     def get(self):
         """Renders the Add New File form.
         """
-        return self.render('templates/add_file.html', file='', errors=[])
+        return self.render('templates/add_file.html', description='', errors=[])
 
     async def post(self):
         """Async handler for accepting file and storing it in DB.
         """
         file = dict(
-            file=self.get_body_argument('file'),
-            log=self.request.files['log'][0] if 'log' in self.request.files else None
+            description=self.get_body_argument('description'),
+            file=self.request.files['file'][0] if 'file' in self.request.files else None
         )
 
         # Validate the file
@@ -55,7 +55,7 @@ class AddFileHandler(tornado.web.RequestHandler):
 class FilesHandler(tornado.web.RequestHandler):
     def get(self):
         """Renders the list of files."""
-        return self.render('templates/list_files.html', files=get_files())
+        return self.render('templates/list_files.html', descriptions=get_files())
 
 
 class LogHandler(tornado.web.RequestHandler):
@@ -67,7 +67,6 @@ class LogHandler(tornado.web.RequestHandler):
             self.write(chunk)
             await self.flush()
         self.finish()
-
 
 # ONLY FOR DEBUGGING PURPOSES
 class PopulateHandler(tornado.web.RequestHandler):

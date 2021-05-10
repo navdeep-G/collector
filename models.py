@@ -31,11 +31,11 @@ def add_file(file: Dict) -> bool:
     :return: boolean success flag
     """
 
-    log_content = file['log']['body']
+    log_content = file['file']['body']
     log_filename = str(uuid.uuid4())
 
     try:
-        _minio_client.make_bucket("logs")
+        _minio_client.make_bucket("files")
     except (BucketAlreadyOwnedByYou, BucketAlreadyExists):
         pass
     except ResponseError:
@@ -43,12 +43,12 @@ def add_file(file: Dict) -> bool:
         return False
 
     try:
-        _minio_client.put_object('logs', log_filename, BytesIO(log_content), len(log_content), 'text/plain')
+        _minio_client.put_object('files', log_filename, BytesIO(log_content), len(log_content), 'text/plain')
     except ResponseError:
         _logger.exception('Minio - saving the log failed.')
         return False
 
-    file['log'] = log_filename
+    file['file'] = log_filename
 
     try:
         _redis_client.set(log_filename, json.dumps(file))
@@ -68,11 +68,11 @@ def validate_file(file: Dict) -> List[str]:
     errors = []
 
     # Maybe it would be wiser to have some minimal required amount of characters.
-    if len(file['file'].strip()) == 0:
-        errors.append('Your file is empty. Please provide your file.')
+    if len(file['description'].strip()) == 0:
+        errors.append('Your description is empty. Please provide a description.')
 
-    if file['log'] is None:
-        errors.append('You did not attach log file. Please attach your log file.')
+    if file['file'] is None:
+        errors.append('You did not attach a file. Please attach your file.')
 
     return errors
 
@@ -91,4 +91,4 @@ def get_log_stream(name: str) -> Generator[Optional[bytes], Any, None]:
     :param name: name (UUID) of the requested log
     :return: requested log as iterable stream of bytes
     """
-    return _minio_client.get_object('logs', name).stream()
+    return _minio_client.get_object('files', name).stream()
