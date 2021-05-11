@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 import tornado.web
 from tornado.ioloop import IOLoop
 
-from models import add_file, validate_file, get_files, get_log_stream
+from models import add_file, validate_file, get_files, get_file_stream
 
 # It appears that the minio is not asyncio "compatible" - it would block
 # So I use threading instead which should work fine since it is an IO-bound
@@ -52,26 +52,18 @@ class AddFileHandler(tornado.web.RequestHandler):
         self.redirect('/')
 
 
-class FilesHandler(tornado.web.RequestHandler):
+class DescriptionHandler(tornado.web.RequestHandler):
     def get(self):
         """Renders the list of files."""
         return self.render('templates/list_files.html', descriptions=get_files())
 
 
-class LogHandler(tornado.web.RequestHandler):
+class FileHandler(tornado.web.RequestHandler):
     async def get(self, name):
-        """Serves the requested log."""
+        """Serves the requested file."""
         self.set_header('Content-Type', 'application/octet-stream')
         self.set_header('Content-Disposition', f'attachment; filename={name}.txt')
-        for chunk in get_log_stream(name):
+        for chunk in get_file_stream(name):
             self.write(chunk)
             await self.flush()
         self.finish()
-
-# ONLY FOR DEBUGGING PURPOSES
-class PopulateHandler(tornado.web.RequestHandler):
-    def get(self):
-        # For docker
-        #os.system('python /app/populate_files.py &')
-        os.system('python populate_files.py &')
-        self.redirect('/')
