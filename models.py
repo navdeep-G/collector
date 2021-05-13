@@ -24,18 +24,18 @@ _redis_client = redis.Redis(host=os.environ['REDIS_URL'],
                             db=int(os.environ['REDIS_DB']))
 
 
-def add_file(file: Dict) -> bool:
-    """Add file consisting of email, file (actual text), rating, and attached log file.
+def add_entry(entry: Dict) -> bool:
+    """Add entry
 
-    :param file: dictionary with the following keys ['email', 'file', 'rating', 'log']
+    :param entry: dictionary with the following keys ['description', 'file']
     :return: boolean success flag
     """
 
-    log_content = file['log']['body']
-    log_filename = str(uuid.uuid4())
+    file_content = entry['file']['body']
+    file_filename = str(uuid.uuid4())
 
     try:
-        _minio_client.make_bucket("logs")
+        _minio_client.make_bucket("entries")
     except (BucketAlreadyOwnedByYou, BucketAlreadyExists):
         pass
     except ResponseError:
@@ -43,15 +43,15 @@ def add_file(file: Dict) -> bool:
         return False
 
     try:
-        _minio_client.put_object('logs', log_filename, BytesIO(log_content), len(log_content), 'text/plain')
+        _minio_client.put_object('entries', file_filename, BytesIO(file_content), len(file_content), 'text/plain')
     except ResponseError:
-        _logger.exception('Minio - saving the log failed.')
+        _logger.exception('Minio - saving the file failed.')
         return False
 
-    file['log'] = log_filename
+    entry['file'] = file_filename
 
     try:
-        _redis_client.set(log_filename, json.dumps(file))
+        _redis_client.set(file_filename, json.dumps(entry))
     except:
         _logger.exception('Setting a redis key failed.')
         return False
@@ -59,36 +59,36 @@ def add_file(file: Dict) -> bool:
     return True
 
 
-def validate_file(file: Dict) -> List[str]:
-    """Validate file consisting of email, file (actual text), rating, and attached log file.
+def validate_entries(entry: Dict) -> List[str]:
+    """Validate entry
 
-    :param file: dictionary with the following keys ['email', 'file', 'rating', 'log']
+    :param entry: dictionary with the following keys ['description', 'file']
     :return: list of errors
     """
     errors = []
 
     # Maybe it would be wiser to have some minimal required amount of characters.
-    if len(file['file'].strip()) == 0:
-        errors.append('Your file is empty. Please provide your file.')
+    if len(entry['description'].strip()) == 0:
+        errors.append('Your description is empty. Please provide a description.')
 
-    if file['log'] is None:
-        errors.append('You did not attach log file. Please attach your log file.')
+    if entry['file'] is None:
+        errors.append('You did not attach a file. Please attach your file.')
 
     return errors
 
 
-def get_files() -> List[Dict]:
-    """Returns files
+def get_entries() -> List[Dict]:
+    """Returns entries
 
-    :return: list of dictionaries with the following keys ['email', 'file', 'rating', 'log']
+    :return: list of dictionaries with the following keys ['description', 'file']
     """
     return [json.loads(_redis_client.get(item)) for item in _redis_client.scan_iter()]
 
 
-def get_log_stream(name: str) -> Generator[Optional[bytes], Any, None]:
-    """Get the correct log from minio.
+def get_file_stream(name: str) -> Generator[Optional[bytes], Any, None]:
+    """Get the correct file from minio.
 
-    :param name: name (UUID) of the requested log
-    :return: requested log as iterable stream of bytes
+    :param name: name (UUID) of the requested file
+    :return: requested file as iterable stream of bytes
     """
-    return _minio_client.get_object('logs', name).stream()
+    return _minio_client.get_object('entries', name).stream()

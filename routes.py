@@ -1,8 +1,7 @@
-from controllers import AddFileHandler, FilesHandler, LogHandler, PopulateHandler
+from controllers import AddFileHandler, DescriptionHandler, FileHandler
 
 routes = [
-    (r'/', FilesHandler),
+    (r'/', DescriptionHandler),
     (r'/add', AddFileHandler),
-    (r'/log/([a-zA-Z\-0-9]*)', LogHandler),
-    (r'/populate', PopulateHandler),
+    (r'/file/([a-zA-Z\-0-9]*)', FileHandler),
 ]

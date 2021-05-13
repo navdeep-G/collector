@@ -1,78 +1,66 @@
-import os
+from abc import ABC
 from concurrent.futures import ThreadPoolExecutor
 
 import tornado.web
 from tornado.ioloop import IOLoop
 
-from models import add_file, validate_file, get_files, get_log_stream
+from models import add_entry, validate_entries, get_entries, get_file_stream
 
-# It appears that the minio is not asyncio "compatible" - it would block
-# So I use threading instead which should work fine since it is an IO-bound
-# operation.
 _executor = ThreadPoolExecutor()
 
 
-class AddFileHandler(tornado.web.RequestHandler):
+class AddFileHandler(tornado.web.RequestHandler, ABC):
     def get(self):
         """Renders the Add New File form.
         """
-        return self.render('templates/add_file.html', file='', errors=[])
+        return self.render('templates/add_entry.html', description='', errors=[])
 
     async def post(self):
         """Async handler for accepting file and storing it in DB.
         """
-        file = dict(
-            file=self.get_body_argument('file'),
-            log=self.request.files['log'][0] if 'log' in self.request.files else None
+        entry = dict(
+            description=self.get_body_argument('description'),
+            file=self.request.files['file'][0] if 'file' in self.request.files else None
         )
 
         # Validate the file
-        errors = validate_file(file)
+        errors = validate_entries(entry)
         if len(errors) > 0:
             return self.render(
-                'templates/add_file.html',
+                'templates/add_entry.html',
                 errors=errors,
-                **file
+                **entry
             )
 
         # Save the file
         success = await IOLoop.current().run_in_executor(
             _executor,
-            add_file,
-            file
+            add_entry,
+            entry
         )
         if not success:
             errors.append('Opps! Something went wrong.')
             return self.render(
-                'templates/add_file.html',
+                'templates/add_entry.html',
                 errors=errors,
-                **file
+                **entry
             )
 
         self.redirect('/')
 
 
-class FilesHandler(tornado.web.RequestHandler):
+class DescriptionHandler(tornado.web.RequestHandler, ABC):
     def get(self):
         """Renders the list of files."""
-        return self.render('templates/list_files.html', files=get_files())
+        return self.render('templates/list_entries.html', entries=get_entries())
 
 
-class LogHandler(tornado.web.RequestHandler):
+class FileHandler(tornado.web.RequestHandler, ABC):
     async def get(self, name):
-        """Serves the requested log."""
+        """Serves the requested file."""
         self.set_header('Content-Type', 'application/octet-stream')
         self.set_header('Content-Disposition', f'attachment; filename={name}.txt')
-        for chunk in get_log_stream(name):
+        for chunk in get_file_stream(name):
             self.write(chunk)
             await self.flush()
         self.finish()
-
-
-# ONLY FOR DEBUGGING PURPOSES
-class PopulateHandler(tornado.web.RequestHandler):
-    def get(self):
-        # For docker
-        #os.system('python /app/populate_files.py &')
-        os.system('python populate_files.py &')
-        self.redirect('/')
