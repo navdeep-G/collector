@@ -9,10 +9,10 @@
     <tr><th>Description</th><th>File</th></tr>
     </thead>
     <tbody>
-    {% for description in descriptions %}
+    {% for entry in entries %}
         <tr>
-            <td>{{description['description']}}</td>
-            <td><a href="/file/{{ description['file'] }}" title="Download file">Download File</a></td>
+            <td>{{entry['description']}}</td>
+            <td><a href="/file/{{ entry['file'] }}" title="Download file">Download File</a></td>
         </tr>
     {% end %}
     </tbody>
