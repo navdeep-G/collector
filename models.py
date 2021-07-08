@@ -8,7 +8,7 @@ from typing import Any, Dict, Generator, List, Optional
 
 import redis
 from minio import Minio
-from minio.error import ResponseError, BucketAlreadyOwnedByYou, BucketAlreadyExists
+from minio.error import InvalidResponseError, S3Error
 
 _logger = logging.getLogger(__name__)
 
@@ -36,15 +36,15 @@ def add_entry(entry: Dict) -> bool:
 
     try:
         _minio_client.make_bucket("entries")
-    except (BucketAlreadyOwnedByYou, BucketAlreadyExists):
+    except (S3Error):
         pass
-    except ResponseError:
+    except InvalidResponseError:
         _logger.exception('Minio response error.')
         return False
 
     try:
         _minio_client.put_object('entries', file_filename, BytesIO(file_content), len(file_content), 'text/plain')
-    except ResponseError:
+    except InvalidResponseError:
         _logger.exception('Minio - saving the file failed.')
         return False
 

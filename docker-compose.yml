@@ -15,8 +15,8 @@ services:
       -  ALLOW_EMPTY_PASSWORD=yes
     ports:
       -  '6379:6379'
-  file-collection-system:
-    image: 'file-collection-system:latest'
+  collector:
+    image: 'collector:latest'
     environment:
       MINIO_ACCESS_KEY:  'ACCESS-KEY'
       MINIO_SECRET_KEY:  'SECRET-KEY'

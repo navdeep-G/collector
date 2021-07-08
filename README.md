@@ -6,7 +6,7 @@ Getting Started
 
 How to run it:
 ```
-$ docker build . -t file-collection-system:latest
+$ docker build . -t collector:latest
 $ docker-compose up
 ```
 and then navigate your browser to http://localhost:8888/.
