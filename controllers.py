@@ -10,10 +10,14 @@ _executor = ThreadPoolExecutor()
 
 
 class AddFileHandler(tornado.web.RequestHandler, ABC):
+    
+    def initialize(self, path):
+        self.path = path
+        
     def get(self):
         """Renders the Add New File form.
         """
-        return self.render('templates/add_entry.html', description='', errors=[])
+        return self.render(self.path, description='', errors=[])
 
     async def post(self):
         """Async handler for accepting file and storing it in DB.
@@ -27,7 +31,7 @@ class AddFileHandler(tornado.web.RequestHandler, ABC):
         errors = validate_entries(entry)
         if len(errors) > 0:
             return self.render(
-                'templates/add_entry.html',
+                'example/templates/add_entry.html',
                 errors=errors,
                 **entry
             )
@@ -41,7 +45,7 @@ class AddFileHandler(tornado.web.RequestHandler, ABC):
         if not success:
             errors.append('Opps! Something went wrong.')
             return self.render(
-                'templates/add_entry.html',
+                'example/templates/add_entry.html',
                 errors=errors,
                 **entry
             )
@@ -50,9 +54,13 @@ class AddFileHandler(tornado.web.RequestHandler, ABC):
 
 
 class DescriptionHandler(tornado.web.RequestHandler, ABC):
+
+    def initialize(self, path):
+        self.path = path
+
     def get(self):
         """Renders the list of files."""
-        return self.render('templates/list_entries.html', entries=get_entries())
+        return self.render(self.path, entries=get_entries())
 
 
 class FileHandler(tornado.web.RequestHandler, ABC):
