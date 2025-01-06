@@ -120,6 +120,7 @@ curl -F "description=Sample File" -F "file=@path/to/file.txt" http://localhost:8
 
 ## **Project Structure**
 
+```bash
 collector/
 ├── controllers.py   # Tornado request handlers for API endpoints
 ├── models.py        # Logic for file handling, validation, and storage
@@ -130,3 +131,4 @@ collector/
 │   ├── app.py       # Example Tornado application
 ├── requirements.txt # Python dependencies
 └── README.md        # Project documentation
+```
