@@ -81,7 +81,7 @@ Redis: redis-cli ping → PONG
 MinIO: Access http://localhost:9001 and log in.
 ```
 
-#### **1.4Install Python Dependencies**
+#### ** 1.4 Install Python Dependencies**
 
 ```bash
 git clone https://github.com/navdeep-G/collector.git
